@@ -1,0 +1,18 @@
+[project]
+name = "pension"
+version = "0.1.0"
+description = "Python simulator for Japanese pension"
+requires-python = ">=3.10"
+
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "streamlit",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest",
+    "ruff",
+    "mypy",
+]

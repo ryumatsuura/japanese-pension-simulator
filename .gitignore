@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environments
+.venv/
+
+# Packaging
+pension.egg-info/
+
+# OS
+.DS_Store
+
+# Streamlit
+.streamlit/
