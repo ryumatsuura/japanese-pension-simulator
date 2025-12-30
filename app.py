@@ -1,7 +1,6 @@
 import streamlit as st
 
 from pension.config import MONTHLY_CONTRIBUTION
-from pension.core import run_one_off_simulation
 from pension.simulation import run_simulation
 
 st.title("国民年金シミュレーター (Japanese Pension Simulator)")
@@ -23,7 +22,7 @@ annual_interest_rate_sd = st.number_input("日本の金利 (%) 標準偏差", 0.
 annual_return = st.number_input("海外での投資リターン (%) (Foreign investment return)", 0.0, 30.0, 5.0)
 annual_return_sd = st.number_input("海外での投資リターン (%) 標準偏差", 0.0, 30.0, 2.5)
 exchange_rate = st.number_input("為替レート (¥) (Exchange rate)", 0.0, 1000.0, 200.0)
-exchange_rate_sd = st.number_input("為替レート (¥) 標準偏差", 0.0, 1000.0, 50.0)
+exchange_rate_sd = st.number_input("為替レート (¥) 標準偏差", 0.0, 1000.0, 20.0)
 
 with st.spinner("シミュレーション実行中..."):
     fig, pension_better_ratio, mean_pension, mean_investment = run_simulation(

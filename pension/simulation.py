@@ -5,11 +5,17 @@ from pension.core import (
     calculate_present_value_jpy_pension, 
     calculate_total_investment_return, 
     convert_jpy_foreign_currency,
+    create_schedule,
 )
 
 from pension.config import MONTHLY_CONTRIBUTION
 
 def freedman_diaconis_bins(data: list) -> int:
+    """Calculate the number of bins for a histogram using the Freedman-Diaconis rule.
+    Args:
+        data (list): The data to be plotted in the histogram.
+    Returns:
+        int: The number of bins for the histogram."""
     data = np.asarray(data)
     q25, q75 = np.percentile(data, [25, 75])
     iqr = q75 - q25
@@ -31,28 +37,45 @@ def run_simulation(
     return_sd: float,
     n_simulations: int = 10_000,
 ):
+    """This function runs a simulation to compare Japanese pension present value and investment return.
+    Args:
+        years_to_receive (int): The number of years the individual will receive the pension.
+        interest_rate_mean (float): The mean annual interest rate in Japan (as a percentage).
+        interest_rate_sd (float): The standard deviation of the annual interest rate in Japan.
+        years_of_contribution (int): The number of years the individual has contributed to the pension.
+        exchange_rate_mean (float): The mean exchange rate from JPY to foreign currency.
+        exchange_rate_sd (float): The standard deviation of the exchange rate.
+        return_mean (float): The mean annual investment return rate (as a percentage).
+        return_sd (float): The standard deviation of the annual investment return rate.
+        n_simulations (int): The number of simulations to run.
+    Returns:
+        fig: The matplotlib figure object containing the histogram.
+        pension_better_ratio (float): The ratio of simulations where pension present value exceeds investment return.
+        mean_pension (float): The mean present value of the pension across simulations.
+        mean_investment (float): The mean investment return across simulations."""
     results = []
+    rng = np.random.default_rng(seed=42)
 
     for _ in range(n_simulations):
-        interest_rates = np.random.normal(
+
+        interest_rate_schedule = create_schedule(
             interest_rate_mean,
             interest_rate_sd,
             years_to_receive,
+            rng,
         )
-        exchange_rates = np.random.normal(
+        exchange_rate_schedule = create_schedule(
             exchange_rate_mean,
             exchange_rate_sd,
             years_of_contribution,
+            rng,
         )
-        returns = np.random.normal(
+        return_rate_schedule = create_schedule(
             return_mean,
             return_sd,
             years_of_contribution,
+            rng,
         )
-
-        interest_rate_schedule = list(enumerate(interest_rates))
-        exchange_rate_schedule = list(enumerate(exchange_rates))
-        return_rate_schedule = list(enumerate(returns))
         contribution_schedule = [] 
         for year in range(0, years_of_contribution): 
             annual_contribution = convert_jpy_foreign_currency(MONTHLY_CONTRIBUTION * 12, exchange_rate_schedule[year][1]) 
