@@ -9,7 +9,7 @@ from pension.core import (
 
 from pension.config import MONTHLY_CONTRIBUTION
 
-def freedman_diaconis_bins(data):
+def freedman_diaconis_bins(data: list) -> int:
     data = np.asarray(data)
     q25, q75 = np.percentile(data, [25, 75])
     iqr = q75 - q25
@@ -87,7 +87,15 @@ def run_simulation(
     ax1.set_ylabel("Pension density")
     ax2.set_ylabel("Investment density")
     ax1.set_title("Japanese Pension vs Investment Return Simulation")
-    fig.legend(loc="upper right")
+    
+    handles1, labels1 = ax1.get_legend_handles_labels()
+    handles2, labels2 = ax2.get_legend_handles_labels()
+    ax1.legend(
+        handles1 + handles2,
+        labels1 + labels2,
+        loc="upper right",
+        frameon=True,
+    )
 
     pension_better_ratio = sum(p > i for p, i in results) / n_simulations
 
