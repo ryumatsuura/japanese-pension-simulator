@@ -81,9 +81,9 @@ def run_simulation(
 
     fig, ax1 = plt.subplots(figsize=(8, 6))
     ax2 = ax1.twinx()
-    ax1.hist(pensions, bins=bins_pensions, density=True, alpha=0.5, label="Pensions")
-    ax2.hist(investments, bins=bins_investments, density=True, alpha=0.5, label="Investments", color="orange")
-    ax1.set_xlabel("Total Amount (JPY)")
+    ax1.hist(pensions, bins=bins_pensions, density=True, alpha=0.5, label="Pension")
+    ax2.hist(investments, bins=bins_investments, density=True, alpha=0.5, label="Investment", color="orange")
+    ax1.set_xlabel("Total Amount (¥)")
     ax1.set_ylabel("Pension density")
     ax2.set_ylabel("Investment density")
     ax1.set_title("Japanese Pension vs Investment Return Simulation")
@@ -99,4 +99,4 @@ def run_simulation(
 
     pension_better_ratio = sum(p > i for p, i in results) / n_simulations
 
-    return fig, pension_better_ratio
+    return fig, pension_better_ratio, np.mean(pensions), np.mean(investments)

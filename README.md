@@ -3,8 +3,7 @@
 A Python-based simulator to compare the present value of Japanese pension benefits against the opportunity cost of investing pension contributions abroad.
 
 The project provides:
-- Deterministic pension vs investment comparison
-- Simulations with uncertainty
+- Simulations of pension vs investment with uncertainty
 - An interactive Streamlit web app
 
 ---
@@ -17,8 +16,7 @@ The project provides:
 
 ## 📊 What this does
 
-- Computes the present value of Japanese pension receipts and investment returns
-- Simulates under uncertainty (exchange rates, returns, interest rates)
+- Simulates the present value of Japanese pension receipts and investment returns under uncertainty (exchange rates, returns, interest rates)
 - Visualises distributions and probabilities
 - Allows interactive exploration via a web UI
 

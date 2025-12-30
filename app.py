@@ -14,31 +14,19 @@ st.text("入力パラメーターは、年金の支払い期間、年金の受�
 
 st.markdown(":small[このシュミレーターでは、国民年金の月々の支払額は2025年度の17,510円、満額受給額は831,700円として計算しています。また、障害年金と遺族年金、手数料については考慮していません。]")
 
-years_of_contribution = st.slider("年金の支払い期間 (Years of contribution)", 1, 40, 20)
-years_to_receive = st.slider("年金の受給期間 (Years to receive pension)", 1, 40, 20)
-annual_interest_rate = st.number_input("日本の金利 (%) (JPN interest rate)", 0.0, 15.0, 1.0)
-annual_return = st.number_input("海外での投資リターン (%) (Foreign investment return)", 0.0, 30.0, 5.0)
-exchange_rate = st.number_input("為替レート (¥) (Exchange rate)", 0.0, 1000.0, 200.0)
-pv, total_return = run_one_off_simulation(
-    years_of_contribution,
-    years_to_receive,
-    annual_interest_rate,
-    annual_return,
-    exchange_rate,
-)
-
-st.metric("年金の現在価値", f"¥{pv:,.0f}")
-st.metric("投資の価値", f"¥{total_return:,.0f}")
-
 st.subheader("シミュレーター")
 
-annual_interest_rate_sd = st.number_input("日本の金利 (%) 標準偏差", 0.0, 15.0, 1.0)
+years_of_contribution = st.slider("年金の支払い期間 (Years of contribution)", 1, 40, 25)
+years_to_receive = st.slider("年金の受給期間 (Years to receive pension)", 1, 40, 25)
+annual_interest_rate = st.number_input("日本の金利 (%) (JPN interest rate)", 0.0, 15.0, 1.0)
+annual_interest_rate_sd = st.number_input("日本の金利 (%) 標準偏差", 0.0, 15.0, 0.5)
+annual_return = st.number_input("海外での投資リターン (%) (Foreign investment return)", 0.0, 30.0, 5.0)
 annual_return_sd = st.number_input("海外での投資リターン (%) 標準偏差", 0.0, 30.0, 2.5)
+exchange_rate = st.number_input("為替レート (¥) (Exchange rate)", 0.0, 1000.0, 200.0)
 exchange_rate_sd = st.number_input("為替レート (¥) 標準偏差", 0.0, 1000.0, 50.0)
 
-if st.button("シミュレーションを実行"):
-    with st.spinner("シミュレーション実行中..."):
-        fig, pension_better_ratio = run_simulation(
+with st.spinner("シミュレーション実行中..."):
+    fig, pension_better_ratio, mean_pension, mean_investment = run_simulation(
             years_to_receive=years_to_receive,
             interest_rate_mean=annual_interest_rate,
             interest_rate_sd=annual_interest_rate_sd,
@@ -49,8 +37,11 @@ if st.button("シミュレーションを実行"):
             return_sd=annual_return_sd,
         )
 
+    st.metric("年金の現在価値の平均値", f"¥{mean_pension:,.0f}")
+    st.metric("投資の価値の平均値", f"¥{mean_investment:,.0f}")
     st.pyplot(fig)
     st.metric(
         "国民年金が投資を上回る確率",
         f"{pension_better_ratio:.2%}",
     )
+
