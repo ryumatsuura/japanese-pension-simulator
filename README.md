@@ -11,7 +11,7 @@ The project provides:
 
 ## 🚀 Live Demo
 
-👉 **[Streamlit App Link]**
+👉 **[[Simulator Link](https://japanese-pension-simulator.streamlit.app/)]**
 
 ---
 
