@@ -15,10 +15,16 @@ st.markdown(":small[このシミュレーターでは、国民年金の月額支
 
 st.subheader("シミュレーター")
 
+currency = st.radio(
+    "年金を受け取る通貨 (Output currency)",
+    options=["JPY", "Foreign currency"],
+    format_func=lambda x: "日本円 (JPY)" if x == "JPY" else "外貨建て (Foreign currency)",
+)
+
 years_of_contribution = st.slider("年金の支払い期間 (Years of contribution)", 1, 40, 25)
 years_to_receive = st.slider("年金の受給期間 (Years to receive pension)", 1, 40, 25)
-annual_interest_rate = st.number_input("日本の金利 (%) (JPN interest rate)", 0.0, 15.0, 1.0)
-annual_interest_rate_sd = st.number_input("日本の金利 (%) 標準偏差", 0.0, 15.0, 0.5)
+annual_interest_rate = st.number_input(f"{'日本' if currency == 'JPY' else '海外'}の金利 (%) (Interest rate)", 0.0, 15.0, 1.0)
+annual_interest_rate_sd = st.number_input(f"{'日本' if currency == 'JPY' else '海外'}の金利 (%) 標準偏差", 0.0, 15.0, 0.5)
 annual_return = st.number_input("海外での投資リターン (%) (Foreign investment return)", 0.0, 30.0, 5.0)
 annual_return_sd = st.number_input("海外での投資リターン (%) 標準偏差", 0.0, 30.0, 2.5)
 exchange_rate = st.number_input("為替レート (¥) (Exchange rate)", 0.0, 1000.0, 200.0)
@@ -34,10 +40,11 @@ with st.spinner("シミュレーション実行中..."):
             exchange_rate_sd=exchange_rate_sd,
             return_mean=annual_return,
             return_sd=annual_return_sd,
+            currency_jpy=(currency == "JPY"),
         )
 
-    st.metric("年金の現在価値の平均値", f"¥{mean_pension:,.0f}")
-    st.metric("投資の価値の平均値", f"¥{mean_investment:,.0f}")
+    st.metric("年金の現在価値の平均値", f"{'¥' if currency == 'JPY' else '$'}{mean_pension:,.0f}")
+    st.metric("投資の価値の平均値", f"{'¥' if currency == 'JPY' else '$'}{mean_investment:,.0f}")
     st.pyplot(fig)
     st.metric(
         "国民年金が投資を上回る確率",

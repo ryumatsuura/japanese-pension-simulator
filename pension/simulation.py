@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from pension.core import (
-    calculate_present_value_jpy_pension, 
+    calculate_present_value_pension, 
     calculate_total_investment_return, 
     convert_jpy_foreign_currency,
     create_schedule,
@@ -35,6 +35,7 @@ def run_simulation(
     exchange_rate_sd: float,
     return_mean: float,
     return_sd: float,
+    currency_jpy: bool = True,
     n_simulations: int = 10_000,
 ):
     """This function runs a simulation to compare Japanese pension present value and investment return.
@@ -47,6 +48,7 @@ def run_simulation(
         exchange_rate_sd (float): The standard deviation of the exchange rate.
         return_mean (float): The mean annual investment return rate (as a percentage).
         return_sd (float): The standard deviation of the annual investment return rate.
+        currency_jpy (bool): Whether to output results in JPY or foreign currency.
         n_simulations (int): The number of simulations to run.
     Returns:
         fig: The matplotlib figure object containing the histogram.
@@ -64,10 +66,16 @@ def run_simulation(
             years_to_receive,
             rng,
         )
-        exchange_rate_schedule = create_schedule(
+        exchange_rate_schedule_contribution = create_schedule(
             exchange_rate_mean,
             exchange_rate_sd,
             years_of_contribution,
+            rng,
+        )
+        exchange_rate_schedule_receipt = create_schedule(
+            exchange_rate_mean,
+            exchange_rate_sd,
+            years_to_receive,
             rng,
         )
         return_rate_schedule = create_schedule(
@@ -78,7 +86,7 @@ def run_simulation(
         )
         contribution_schedule = [] 
         for year in range(0, years_of_contribution): 
-            annual_contribution = convert_jpy_foreign_currency(MONTHLY_CONTRIBUTION * 12, exchange_rate_schedule[year][1]) 
+            annual_contribution = convert_jpy_foreign_currency(MONTHLY_CONTRIBUTION * 12, exchange_rate_schedule_contribution[year][1]) 
             contribution_schedule.append((year, annual_contribution)) 
 
         final_exchange_rate = np.random.normal(
@@ -86,15 +94,19 @@ def run_simulation(
             exchange_rate_sd,
         )
 
-        present_value_of_pension = calculate_present_value_jpy_pension(
+        present_value_of_pension = calculate_present_value_pension(
             years_of_contribution,
             interest_rate_schedule,
             years_to_receive,
+            exchange_rate_schedule_receipt,
+            currency_jpy,
         )
-        total_return_of_investment = convert_jpy_foreign_currency(calculate_total_investment_return(
+        total_return_of_investment = calculate_total_investment_return(
             contribution_schedule,
             return_rate_schedule,
-        ), 1 / final_exchange_rate)
+            final_exchange_rate,
+            currency_jpy,
+        )
         results.append([present_value_of_pension, total_return_of_investment])
 
     pensions, investments = zip(*results)
@@ -106,7 +118,7 @@ def run_simulation(
     ax2 = ax1.twinx()
     ax1.hist(pensions, bins=bins_pensions, density=True, alpha=0.5, label="Pension")
     ax2.hist(investments, bins=bins_investments, density=True, alpha=0.5, label="Investment", color="orange")
-    ax1.set_xlabel("Total Amount (¥)")
+    ax1.set_xlabel(f"Total Amount ({'¥' if currency_jpy else '$'})")
     ax1.set_ylabel("Pension density")
     ax2.set_ylabel("Investment density")
     ax1.set_title("Japanese Pension vs Investment Return Simulation")
